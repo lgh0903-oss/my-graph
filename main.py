@@ -1,4 +1,4 @@
-```python
+
 import streamlit as st
 import pandas as pd
 import plotly.express as px
@@ -190,4 +190,4 @@ fig2.update_traces(
 
 fig2.update_layout(
     h
-```
+
