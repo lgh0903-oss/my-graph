@@ -1,3 +1,4 @@
+```python
 import streamlit as st
 import pandas as pd
 import plotly.express as px
@@ -25,6 +26,7 @@ DATA_URL = (
     "main/data/kobis_daily.csv"
 )
 
+
 @st.cache_data
 def load_data():
     df = pd.read_csv(DATA_URL)
@@ -46,7 +48,10 @@ def load_data():
     ]
 
     for column in numeric_columns:
-        df[column] = pd.to_numeric(df[column], errors="coerce")
+        df[column] = pd.to_numeric(
+            df[column],
+            errors="coerce"
+        )
 
     return df
 
@@ -80,13 +85,15 @@ selected_movie = st.selectbox(
 )
 
 # 선택한 영화 데이터
-movie_df = df[df["영화명"] == selected_movie].copy()
+movie_df = df[
+    df["영화명"] == selected_movie
+].copy()
 
 # 날짜순 정렬
 movie_df = movie_df.sort_values("날짜")
 
 # 선 그래프
-fig = px.line(
+fig1 = px.line(
     movie_df,
     x="날짜",
     y="일관객",
@@ -98,15 +105,15 @@ fig = px.line(
     }
 )
 
-# 마우스를 올렸을 때 날짜와 관객 수가 보이도록 설정
-fig.update_traces(
+# 마우스를 올렸을 때 날짜와 관객 수 표시
+fig1.update_traces(
     hovertemplate=
     "<b>날짜</b>: %{x|%Y-%m-%d}<br>"
     "<b>일관객</b>: %{y:,}명"
     "<extra></extra>"
 )
 
-fig.update_layout(
+fig1.update_layout(
     hovermode="x unified",
     xaxis_title="날짜",
     yaxis_title="일관객 수(명)",
@@ -114,13 +121,11 @@ fig.update_layout(
 )
 
 st.plotly_chart(
-    fig,
+    fig1,
     use_container_width=True
 )
 
-# --------------------------------------------------
 # 그래프로 알 수 있는 것
-# --------------------------------------------------
 st.subheader("📝 이 그래프로 알 수 있는 것")
 
 st.info(
@@ -129,26 +134,60 @@ st.info(
 
 
 # ==================================================
-# 그래프 추가 영역
+# 그래프 2. 기간 내 일관객 합계 TOP 5 영화
 # ==================================================
 
 st.divider()
-st.header("📊 그래프 2")
+st.header("📊 그래프 2. 일관객 합계 TOP 5 영화")
 
-st.info(
-    "앞으로 새로운 그래프를 추가할 수 있는 공간입니다."
+st.write(
+    "이 기간 동안 일관객 합계가 가장 큰 5편의 날짜별 일관객 변화를 비교합니다."
 )
 
-# 새로운 그래프는 아래에 계속 추가하면 됩니다.
-
-
-# ==================================================
-# 그래프 3 추가 영역
-# ==================================================
-
-st.divider()
-st.header("📊 그래프 3")
-
-st.info(
-    "앞으로 새로운 그래프를 추가할 수 있는 공간입니다."
+# 영화별 일관객 합계 계산
+movie_total = (
+    df.groupby("영화명", as_index=False)["일관객"]
+    .sum()
+    .sort_values("일관객", ascending=False)
 )
+
+# 일관객 합계가 가장 큰 5편
+top5_movies = movie_total.head(5)["영화명"].tolist()
+
+# TOP 5 영화만 추출
+top5_df = df[
+    df["영화명"].isin(top5_movies)
+].copy()
+
+# 날짜순 정렬
+top5_df = top5_df.sort_values(
+    ["날짜", "영화명"]
+)
+
+# 날짜별 일관객 비교 그래프
+fig2 = px.line(
+    top5_df,
+    x="날짜",
+    y="일관객",
+    color="영화명",
+    markers=True,
+    title="일관객 합계 상위 5편의 날짜별 일관객 변화",
+    labels={
+        "날짜": "날짜",
+        "일관객": "일관객 수",
+        "영화명": "영화"
+    }
+)
+
+# 마우스를 올렸을 때 날짜와 관객 수 표시
+fig2.update_traces(
+    hovertemplate=
+    "<b>영화</b>: %{fullData.name}<br>"
+    "<b>날짜</b>: %{x|%Y-%m-%d}<br>"
+    "<b>일관객</b>: %{y:,}명"
+    "<extra></extra>"
+)
+
+fig2.update_layout(
+    h
+```
