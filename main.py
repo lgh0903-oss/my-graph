@@ -298,3 +298,14 @@ fig4 = px.bar(total.sort_values("관객합계"), x="관객합계", y="영화명"
               orientation="h", hover_data=["등장일수"])
 st.plotly_chart(fig4, width="stretch")
 st.caption("이 그래프로 알 수 있는 것: (한 문장으로 적어 보세요)")
+# ── 그래프 5. 월 × 요일 히트맵 ──────────────────────────────
+st.header("5. 월과 요일로 접어 보기")
+요일이름 = ["월", "화", "수", "목", "금", "토", "일"]
+df["월"] = df["날짜"].dt.month
+df["요일"] = df["날짜"].dt.weekday.map(lambda i: 요일이름[i])
+pivot = (df.pivot_table(index="월", columns="요일", values="일관객", aggfunc="sum")
+           .reindex(columns=요일이름))
+fig5 = px.imshow(pivot, text_auto=".2s", aspect="auto",
+                 labels=dict(x="요일", y="월", color="관객"))
+st.plotly_chart(fig5, width="stretch")
+st.caption("이 그래프로 알 수 있는 것: (한 문장으로 적어 보세요)")
